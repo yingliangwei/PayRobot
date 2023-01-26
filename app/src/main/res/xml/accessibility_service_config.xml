@@ -1,0 +1,12 @@
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_service_description"
+    android:packageNames="cn.gov.pbc.dcep"
+    android:canRequestFilterKeyEvents="true"
+    android:canRequestEnhancedWebAccessibility="true"
+    android:accessibilityEventTypes="typeAllMask|typeNotificationStateChanged"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:canPerformGestures="true"
+    android:notificationTimeout="1000"
+    android:canRetrieveWindowContent="true"
+    android:accessibilityFlags="flagIncludeNotImportantViews|flagReportViewIds|flagRequestEnhancedWebAccessibility|flagRequestFilterKeyEvents|flagRetrieveInteractiveWindows"
+    android:settingsActivity="com.miraclegarden.payrobot.Activity.MainActivity"/>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_icon_control_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:keepScreenOn="true"
+    android:orientation="vertical"
+    android:theme="@style/Theme.PayRobot">
+
+    <com.miraclegarden.payrobot.CircleImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/rmb" />
+
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_width="350dp"
+        android:layout_height="300dp"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/purple_500"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/Storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="模拟通知"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/delete"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:src="@mipmap/delete" />
+
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="5dp"
+                android:text="内容显示:\n"
+                android:textColor="@color/black"
+                android:textIsSelectable="true" />
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</LinearLayout>
