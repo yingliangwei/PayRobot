@@ -15,7 +15,7 @@ public class MySqliteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table bill(id integer primary key autoincrement,name text)");
+        db.execSQL("create table bill(id integer primary key autoincrement ,name text)");
     }
 
     @Override

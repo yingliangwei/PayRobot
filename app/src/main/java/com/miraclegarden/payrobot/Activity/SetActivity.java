@@ -32,6 +32,7 @@ public class SetActivity extends MiracleGardenActivity<ActivitySetBinding> {
         binding.button.setOnClickListener(v -> {
             SharedPreferences.Editor edit = config.edit();
             edit.putString("url", binding.url.getText().toString());
+            edit.putLong("time", System.currentTimeMillis());
             edit.apply();
             Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
         });

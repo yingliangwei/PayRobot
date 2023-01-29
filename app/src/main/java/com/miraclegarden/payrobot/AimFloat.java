@@ -9,7 +9,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -33,24 +32,8 @@ import com.miraclegarden.payrobot.Activity.MainActivity;
 import com.miraclegarden.payrobot.Helper.MySqliteHelper;
 import com.miraclegarden.payrobot.databinding.LayoutMainBinding;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class AimFloat extends Service {
     private static SharedPreferences config;
@@ -61,7 +44,6 @@ public class AimFloat extends Service {
     public static final String LOG_TAG = new String(Base64.decode("emVjbGF5eA==", 0));
     //数据库储存
     private static MySqliteHelper mySqliteHelper;
-
     public static boolean floataim;
     private float downRawX;
     private float downRawY;
@@ -88,110 +70,25 @@ public class AimFloat extends Service {
     };
     private NotificationManager notificationManager;
 
-    public static void sendMessage(String time, String str) {
-        if (binding != null) {
-            try {
-                okhttp(time, str);
-            } catch (Exception e) {
-                AimFloat.setMessage("上传失败:" + e.getMessage());
-            }
-            return;
-        }
-        Message message = new Message();
-        message.obj = "控件为空";
-        AimFloat.handler.sendMessage(message);
-    }
 
     public static void setMessage(String mess) {
-        if (binding == null) {
-            return;
+        try {
+            if (binding == null) {
+                return;
+            }
+            Message message = new Message();
+            message.what = 0;
+            message.obj = mess;
+            AimFloat.handler.sendMessage(message);
+        } catch (Exception e) {
+            e.fillInStackTrace();
         }
-        Message message = new Message();
-        message.what = 0;
-        message.obj = mess;
-        AimFloat.handler.sendMessage(message);
     }
 
     public static void setMessage(int what) {
         Message message = new Message();
         message.what = what;
         AimFloat.handler.sendMessage(message);
-    }
-
-    private static void okhttp(String time, String str) {
-        if (config == null) {
-            setMessage("上传失败：配置为空");
-            return;
-        }
-
-        String url = config.getString("url", "1");
-        if (url.equals("1")) {
-            setMessage("上传失败: 未设置url");
-            return;
-        }
-
-        String name = str.substring(0, str.indexOf("向您尾号为"));
-        String end = str.substring(str.indexOf("向您尾号为") + 5, str.indexOf("的数字钱包"));
-        String type = str.substring(str.indexOf("数字钱包") + 4, str.indexOf("¥"));
-        String money = str.substring(str.indexOf("¥") + 1);
-        String sign = sign(url, type, name, money, time, end);
-        String text = "转账:" + type + "|转账人:" + name + "|时间:" + time + "|金额:" + money + "|尾号:" + end;
-        String post = "sign=" + sign + "&timestamp=" + time + "&type=" + type + "&name=" + name + "&money=" + money + "&last=" + end;
-        String aes = ShortcutEncryption.java_openssl_encrypt(post);
-        FormBody.Builder formBody = new FormBody.Builder();
-        formBody.add("data", aes);
-        setMessage(text);
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(url)
-                .post(formBody.build())
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                setMessage("上传失败" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                //判断是否是200
-                //获取服务器数据
-                String text = response.body().string();
-                setMessage(str + "上传成功:" + text);
-                //储存到本地
-                mySqliteHelper.getReadableDatabase().execSQL("INSERT INTO bill (name) VALUES ('" + str + "') ");
-            }
-        });
-    }
-
-
-    private static String sign(String url, String type, String name, String money, String time, String last) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("type", type);
-            jsonObject.put("name", name);
-            jsonObject.put("money", money);
-            jsonObject.put("last", last);
-            String key = StingToMD5(url);
-            //从字符串获取key
-            jsonObject.put("key", key);
-            jsonObject.put("time", time);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //sendMessage("密匙:"+ jsonObject.toString());
-        return StingToMD5(jsonObject.toString());
-    }
-
-    private static String StingToMD5(String text) {
-        try {
-            byte[] s = MessageDigest.getInstance("md5").digest(text.getBytes(StandardCharsets.UTF_8));
-            //16位
-            return new BigInteger(1, s).toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 

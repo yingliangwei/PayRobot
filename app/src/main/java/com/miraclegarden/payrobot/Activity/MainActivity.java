@@ -1,13 +1,13 @@
 package com.miraclegarden.payrobot.Activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,17 +17,24 @@ import android.os.Message;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.widget.NestedScrollView;
 
 import com.miraclegarden.library.app.MiracleGardenActivity;
+import com.miraclegarden.payrobot.Accessibility1Service;
 import com.miraclegarden.payrobot.AimFloat;
-import com.miraclegarden.payrobot.MyAccessibilityService;
 import com.miraclegarden.payrobot.R;
 import com.miraclegarden.payrobot.databinding.ActivityMainBinding;
 
@@ -57,6 +64,8 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
             }
         }
     };
+    private SharedPreferences config;
+    private ActivityResultLauncher<Intent> launch;
 
     public static void sendMessage(String str) {
         if (textView != null && scrollView != null) {
@@ -71,6 +80,12 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        launch = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_CANCELED) {
+                //成功获取到权限
+            }
+        });
+        config = getSharedPreferences("config", MODE_PRIVATE);
         permissionWindows();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         scrollView = binding.scrollable;
@@ -80,7 +95,6 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         if (item.getItemId() == R.id.set) {
             startActivity(new Intent(this, SetActivity.class));
         }
@@ -105,16 +119,28 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
                 AimFloat.IsVisibility = true;
             }
         });
+        binding.cho.setOnClickListener(v -> {
+            SharedPreferences.Editor edit = config.edit();
+            edit.putLong("time", System.currentTimeMillis());
+            edit.apply();
+            Toast.makeText(this, "重置成功", Toast.LENGTH_SHORT).show();
+        });
+        binding.dk.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            ComponentName componentName = new ComponentName("cn.gov.pbc.dcep", "cn.gov.pbc.dcep.DcepLauncherActivity");
+            intent.setComponent(componentName);
+            startActivity(intent);
+        });
     }
 
 
     private void permissionWindows() {
         if (!Settings.canDrawOverlays(this)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder((Context) this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("This application requires window overlays access permission, please allow first.");
             builder.setPositiveButton("OK", (param1DialogInterface, param1Int) -> {
                 Intent intent = new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION", Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, MainActivity.REQUEST_OVERLAY_PERMISSION);
+                launch.launch(intent);
             });
             builder.setCancelable(false);
             builder.show();
@@ -133,7 +159,11 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
     @Override
     protected void onResume() {
         super.onResume();
-        boolean b = isServiceON(this, MyAccessibilityService.class.getName());
+        String url = config.getString("url", "1");
+        if (url.equals("1")) {
+            startActivity(new Intent(this, SetActivity.class));
+        }
+        boolean b = isServiceON(this, Accessibility1Service.class.getName());
         if (!b) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -143,6 +173,13 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
         }
     }
 
+
+    @Override
+    public void finish() {
+        super.finish();
+        stopService(new Intent(this, AimFloat.class));
+        AimFloat.floataim = false;
+    }
 
     public static boolean isServiceON(Context context, String className) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
@@ -156,14 +193,5 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
             }
         }
         return false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (MyAccessibilityService.timer != null) {
-            MyAccessibilityService.timer.cancel();
-            MyAccessibilityService.timer = null;
-        }
     }
 }

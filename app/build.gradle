@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.miraclegarden.payrobot"
-        minSdk 31
+        minSdk 28
         targetSdk 33
-        versionCode 8
-        versionName "1.8"
+        versionCode 14
+        versionName "2.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -32,6 +32,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.firebase:firebase-crashlytics-buildtools:2.8.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation "com.github.yingliangwei:MiracleGardenLib:1.0"
