@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PayRobot">
         <service
-            android:name=".Accessibility1Service"
+            android:name=".accessibilityService.AccessibilityService"
             android:exported="true"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
@@ -31,7 +31,7 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
         <activity
-            android:name=".Activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,6 +41,6 @@
         <service
             android:name=".AimFloat"
             android:exported="false" />
-        <activity android:name=".Activity.SetActivity" />
+        <activity android:name=".activity.SetActivity" />
     </application>
 </manifest>

@@ -7,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Path;
 import android.util.Log;
@@ -16,9 +15,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.annotation.NonNull;
 
-import com.miraclegarden.payrobot.Activity.AimFloatCallback;
-import com.miraclegarden.payrobot.Activity.MainActivity;
-import com.miraclegarden.payrobot.Helper.MySqliteHelper;
+import com.miraclegarden.payrobot.activity.MainActivity;
+import com.miraclegarden.payrobot.helper.MySqliteHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.Callback;

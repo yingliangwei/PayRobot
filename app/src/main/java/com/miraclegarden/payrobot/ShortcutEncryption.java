@@ -1,6 +1,7 @@
 package com.miraclegarden.payrobot;
 
 
+import com.example.nativelib.NativeLib;
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.codec.binary.Base64;
 
 import java.security.InvalidAlgorithmParameterException;
@@ -22,11 +23,9 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class ShortcutEncryption {
 
-    private final static String KEY = "efg59b69324c8abc";
-    private final static String IV = "abc7fe7d74f4dert";
-
     public static String java_openssl_encrypt(String data) {
-        return java_openssl_encrypt(data, IV);
+        NativeLib nativeLib=new NativeLib();
+        return java_openssl_encrypt(data, nativeLib.stringFromJNI1());
     }
 
     /**
@@ -47,7 +46,8 @@ public class ShortcutEncryption {
     }
 
     public static String java_openssl_decrypt(String data) {
-        return java_openssl_decrypt(data, IV);
+        NativeLib nativeLib=new NativeLib();
+        return java_openssl_decrypt(data, nativeLib.stringFromJNI1());
     }
 
 
@@ -83,7 +83,8 @@ public class ShortcutEncryption {
      * @throws InvalidAlgorithmParameterException
      */
     private static Cipher createCipher(String iv, int mode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        byte[] key = KEY.getBytes();
+        NativeLib nativeLib=new NativeLib();
+        byte[] key = nativeLib.stringFromJNI().getBytes();
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv.getBytes());
         cipher.init(mode, new SecretKeySpec(key, "AES"), ivParameterSpec);

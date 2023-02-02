@@ -4,7 +4,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.util.Log;
 
-import com.miraclegarden.payrobot.Activity.MainActivity;
+import com.miraclegarden.payrobot.activity.MainActivity;
 
 public class MyCallBack extends AccessibilityService.GestureResultCallback {
     public MyCallBack() {

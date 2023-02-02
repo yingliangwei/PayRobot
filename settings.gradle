@@ -20,3 +20,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "PayRobot"
 include ':app'
+include ':AccessibilityLib'
+include ':nativelib'

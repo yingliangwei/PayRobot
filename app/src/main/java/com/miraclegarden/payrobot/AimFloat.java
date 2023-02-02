@@ -28,8 +28,8 @@ import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 
-import com.miraclegarden.payrobot.Activity.MainActivity;
-import com.miraclegarden.payrobot.Helper.MySqliteHelper;
+import com.miraclegarden.payrobot.activity.MainActivity;
+import com.miraclegarden.payrobot.helper.MySqliteHelper;
 import com.miraclegarden.payrobot.databinding.LayoutMainBinding;
 
 import java.text.SimpleDateFormat;

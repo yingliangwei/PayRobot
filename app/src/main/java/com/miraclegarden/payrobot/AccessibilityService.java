@@ -1,14 +1,11 @@
 package com.miraclegarden.payrobot;
 
 import android.accessibilityservice.GestureDescription;
-import android.content.ComponentName;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Path;
-import android.os.Looper;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -16,8 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.miraclegarden.payrobot.Activity.MainActivity;
-import com.miraclegarden.payrobot.Helper.MySqliteHelper;
+import com.miraclegarden.payrobot.activity.MainActivity;
+import com.miraclegarden.payrobot.helper.MySqliteHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
