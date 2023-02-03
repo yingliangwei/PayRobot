@@ -78,8 +78,25 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private void STATE_CHANGED(AccessibilityNodeInfo nodeInfo) {
         List<AccessibilityNodeInfo> nodeInfos = new ArrayList<>();
         CollectionDataUtils.getAccessibilityNodeInfoS(nodeInfos, nodeInfo);
-        //点击交易界面，来通知以后他会返回交易界面
-        CollectionDataUtils.click2(nodeInfos, "交易记录");
+
+        if (isOK) {
+            boolean dui = CollectionDataUtils.click(nodeInfos, "返回");
+            print("上传完成,点击返回:" + dui);
+        }
+
+        for (AccessibilityNodeInfo nodeInfo1 : nodeInfos) {
+            if (nodeInfo1.getClassName().equals("android.webkit.WebView") && nodeInfo1.getText().equals("交易记录")) {
+                //进入交易界面
+                if (isOK) {
+                    isRun = true;
+                    isOK = false;
+                }
+            } else if (nodeInfo1.getClassName().equals("android.widget.TextView")) {
+                //返回的交易界面
+                //点击交易界面，来通知以后他会返回交易界面
+                CollectionDataUtils.click2(nodeInfos, "交易记录");
+            }
+        }
 
         //来通知了
         boolean isc = CollectionDataUtils.isText(nodeInfos, "查看");
@@ -107,7 +124,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             CollectionDataUtils.click(nodeInfos, "查看");
         }
 
-        CHANGED(nodeInfo);
+        //CHANGED(nodeInfo);
     }
 
     //SCROLLED
@@ -159,22 +176,13 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     //告诉前面可以返回了
                     isOK = true;
                     //可以进行账单遍历了
-                    isRun = false;
+                    isRun = true;
                     isStart = false;
+                    isYes = true;
                 } catch (JSONException e) {
                     print("错误" + e);
                     return;
                 }
-            }
-
-            if (isOK) {
-                isOK = false;
-                boolean dui = CollectionDataUtils.click(nodeInfos, "返回");
-                print("上传完成,点击返回:" + dui);
-            } else {
-                //进去获取订单编号
-                boolean dui = CollectionDataUtils.click2(nodeInfos, "对此订单有疑问");
-                print("点击：对此订单有疑问状态:" + dui);
             }
 
         }
@@ -212,6 +220,15 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             } catch (JSONException e) {
                 print("错误" + e);
             }
+        }
+
+        if (isOK) {
+            boolean dui = CollectionDataUtils.click(nodeInfos, "返回");
+            print("上传完成,点击返回:" + dui);
+        } else {
+            //进去获取订单编号
+            boolean dui = CollectionDataUtils.click2(nodeInfos, "对此订单有疑问");
+            print("点击：对此订单有疑问状态:" + dui);
         }
     }
 
@@ -508,11 +525,14 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                     while (true) {
                         //退出循环
                         if (isRun) {
+                            print("退出循环");
                             break;
                         }
                     }
+                    isRun = false;
                     //退出全部循环
                     if (isStart) {
+                        isStart = false;
                         break;
                     }
                     while (true) {
@@ -520,8 +540,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
                         if (isYes) {
                             isYes = false;
                             //不管前面有没有完成，直接记录
-                            boolean in = inst(str);
-                            print("插入账单信息：" + in);
+                            // boolean in = inst(str);
+                            //print("插入账单信息：" + in);
                             break;
                         }
                     }

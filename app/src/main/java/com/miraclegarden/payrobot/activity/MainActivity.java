@@ -31,6 +31,7 @@ import com.miraclegarden.library.app.MiracleGardenActivity;
 import com.miraclegarden.payrobot.AimFloat;
 import com.miraclegarden.payrobot.R;
 import com.miraclegarden.payrobot.accessibilityService.Accessibility1Service;
+import com.miraclegarden.payrobot.accessibilityService.Accessibility2Service;
 import com.miraclegarden.payrobot.accessibilityService.AccessibilityService;
 import com.miraclegarden.payrobot.databinding.ActivityMainBinding;
 
@@ -159,7 +160,7 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
         if (url.equals("1")) {
             startActivity(new Intent(this, SetActivity.class));
         }
-        boolean b = isServiceON(this, AccessibilityService.class.getName());
+        boolean b = isServiceON(this, Accessibility2Service.class.getName());
         if (!b) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

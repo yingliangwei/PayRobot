@@ -108,7 +108,17 @@ public class CollectionDataUtils {
     public static boolean click2(List<AccessibilityNodeInfo> nodeInfos, String text) {
         for (AccessibilityNodeInfo accessibilityNodeInfo : nodeInfos) {
             if (accessibilityNodeInfo.getText().toString().contains(text)) {
-                return performClickNodeInfo(accessibilityNodeInfo);
+                boolean clion = performClickNodeInfo(accessibilityNodeInfo);
+                if (clion) {
+                    return true;
+                } else {
+                    while (true) {
+                        clion = performClickNodeInfo(accessibilityNodeInfo);
+                        if (clion) {
+                            return true;
+                        }
+                    }
+                }
             }
         }
         return false;
@@ -120,9 +130,24 @@ public class CollectionDataUtils {
      * @param text      找寻该集合是否存在该字符串，然后模拟点击
      */
     public static boolean click(List<AccessibilityNodeInfo> nodeInfos, String text) {
-        for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
-            if (nodeInfo.getText().toString().equals(text)) {
-                return performClickNodeInfo(nodeInfo);
+        for (AccessibilityNodeInfo accessibilityNodeInfo : nodeInfos) {
+            if (accessibilityNodeInfo.getText().toString().equals(text)) {
+                boolean clion = performClickNodeInfo(accessibilityNodeInfo);
+                if (clion) {
+                    return true;
+                } else {
+                    int size = 0;
+                    while (true) {
+                        size++;
+                        clion = performClickNodeInfo(accessibilityNodeInfo);
+                        if (clion) {
+                            return true;
+                        }
+                        if (size >= 10) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
         return false;
