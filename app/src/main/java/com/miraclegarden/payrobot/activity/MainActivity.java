@@ -32,6 +32,7 @@ import com.miraclegarden.payrobot.AimFloat;
 import com.miraclegarden.payrobot.R;
 import com.miraclegarden.payrobot.accessibilityService.Accessibility1Service;
 import com.miraclegarden.payrobot.accessibilityService.Accessibility2Service;
+import com.miraclegarden.payrobot.accessibilityService.Accessibility3Service;
 import com.miraclegarden.payrobot.accessibilityService.AccessibilityService;
 import com.miraclegarden.payrobot.databinding.ActivityMainBinding;
 

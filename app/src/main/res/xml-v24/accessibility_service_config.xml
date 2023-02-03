@@ -7,6 +7,6 @@
     android:canRequestFilterKeyEvents="true"
     android:canRetrieveWindowContent="true"
     android:description="@string/accessibility_service_description"
-    android:notificationTimeout="0"
+    android:notificationTimeout="800"
     android:packageNames="cn.gov.pbc.dcep"
     android:settingsActivity="com.miraclegarden.payrobot.Activity.MainActivity" />

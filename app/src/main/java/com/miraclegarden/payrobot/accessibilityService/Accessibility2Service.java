@@ -48,12 +48,10 @@ public class Accessibility2Service extends AccessibilityService implements Runna
         new Thread(this).start();
     }
 
-
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         config = getSharedPreferences("config", MODE_PRIVATE);
         if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
-            //刷新View改变事件
             TYPE_VIEW_SCROLLED(event.getSource());
         } else if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             //界面切换开始的数据，通常获取不全
@@ -76,10 +74,12 @@ public class Accessibility2Service extends AccessibilityService implements Runna
         String tag = "问题反馈";
         boolean isText = CollectionDataUtils.isText(nodeInfos, tag);
         if (isText) {
+            print("进入" + tag);
             //获取第5节点得到编码号
             String str = nodeInfos.get(nodeInfos.size() - 5).getText().toString();
             str = str.substring(str.length() - 4);
             if (!isNumeric(str)) {
+                print(tag + "钱包编码" + str);
                 //这里不能返回，因为加载数据中可能不是数字
                 return;
             }
@@ -108,10 +108,15 @@ public class Accessibility2Service extends AccessibilityService implements Runna
         if (wall == null) {
             print(tag + "点击对此订单有疑问");
             //如果wall一直为空一直死循环
-            CollectionDataUtils.click2(nodeInfos, "对此订单有疑问");
+            boolean is = CollectionDataUtils.click2(nodeInfos, "对此订单有疑问");
+            if (!is) {
+                print(tag + "点击失败返回");
+                print(tag + wall);
+            }
             return;
         }
 
+        print(tag + "解析账单");
         JSONObject jsonObject = getDetails(nodeInfos);
         if (jsonObject == null) {
             print(tag + "解析详细订单错误！");
@@ -132,12 +137,16 @@ public class Accessibility2Service extends AccessibilityService implements Runna
                 if (body != null) {
                     print(tag + "忘记插入" + body);
                     String md = CollectionDataUtils.StingToMD5(body);
-                    inst(md);
+                    print(tag + "插入" + inst(md));
                 }
                 return;
             }
+            print(tag + "开始上传");
             upload(nodeInfos, jsonObject.toString());
+            //直接插入以免重复上传
+            inst(md5);
         } catch (Exception e) {
+            print("插入错误" + e);
             e.fillInStackTrace();
         }
     }
@@ -158,6 +167,7 @@ public class Accessibility2Service extends AccessibilityService implements Runna
             return;
         }
         uploadPost(nodeInfos, url, toString);
+
     }
 
     private int billSize;
@@ -208,9 +218,11 @@ public class Accessibility2Service extends AccessibilityService implements Runna
                 AimFloat.setMessage("成功提交数量:" + billSize);
                 isHttpOk = true;
                 wall = null;
-                String md4 = CollectionDataUtils.StingToMD5(body);
-                //记录通知栏来的信息，进行记录，以免二次打开
-                inst(md4);
+                if (body != null) {
+                    String md4 = CollectionDataUtils.StingToMD5(body);
+                    //记录通知栏来的信息，进行记录，以免二次打开
+                    inst(md4);
+                }
                 body = null;
                 String tag = "交易详情";
                 //进入交易详情
@@ -373,32 +385,68 @@ public class Accessibility2Service extends AccessibilityService implements Runna
         return null;
     }
 
-    private boolean isRun;
+    private volatile boolean isRun;
 
     private void TYPE_WINDOW_STATE_CHANGED(AccessibilityNodeInfo source) {
         List<AccessibilityNodeInfo> nodeInfos = new ArrayList<>();
         CollectionDataUtils.getAccessibilityNodeInfoS(nodeInfos, source);
         goNotice(nodeInfos);
-
         boolean isjy = CollectionDataUtils.isText(nodeInfos, "交易记录");
         if (isjy && isHttpOk) {
             //前面步骤以完成
             isRun = true;
+            // thread = null;
+            print("前面步骤完成" + isRun);
         }
 
         //进入交易详情
         boolean isText = CollectionDataUtils.isText(nodeInfos, "交易详情");
         if (isText && this.body == null) {
-            print("页面不对");
+            isRun = true;
+            print("交易详情页面不对");
             CollectionDataUtils.click(nodeInfos, "返回");
         } else if (isText && isHttpOk) {
+            //前面步骤以完成
+            isRun = true;
             print("上传步骤成功");
             CollectionDataUtils.click(nodeInfos, "返回");
+        } else if (isText && this.wall != null) {
+            String tag = "返回获取到的详细账单";
+            //返回进入的交易详情
+            JSONObject jsonObject = getDetails(nodeInfos);
+            if (jsonObject == null) {
+                print(tag + "解析详细订单错误！");
+                return;
+            }
+            try {
+                jsonObject.put("wall", wall);
+                //判断是否上传过
+                String md5 = CollectionDataUtils.StingToMD5(jsonObject.toString());
+                if (hasData(md5)) {
+                    print(tag + "已经记录:" + jsonObject);
+                    //因为已经上传过了，所以wall可以为空，通知前面已经完毕
+                    wall = null;
+                    isHttpOk = true;
+                    //进入交易详情
+                    print(tag + "点击" + CollectionDataUtils.click(nodeInfos, "返回"));
+                    if (body != null) {
+                        print(tag + "忘记插入" + body);
+                        String md = CollectionDataUtils.StingToMD5(body);
+                        print(tag + "插入" + inst(md));
+                    }
+                    return;
+                }
+                print(tag + "开始上传");
+                upload(nodeInfos, jsonObject.toString());
+                inst(md5);
+            } catch (Exception e) {
+                e.fillInStackTrace();
+            }
         }
 
         boolean is = CollectionDataUtils.isText(nodeInfos, "问题反馈");
         if (is) {
-            print("页面不对");
+            print("问题反馈页面不对");
             CollectionDataUtils.click(nodeInfos, "返回");
         }
 
@@ -407,11 +455,15 @@ public class Accessibility2Service extends AccessibilityService implements Runna
                 //返回的交易界面
                 //点击交易界面，来通知以后他会返回交易界面
                 CollectionDataUtils.click2(nodeInfos, "交易记录");
+                isNotice = false;
             }
         }
     }
 
     private boolean isNotice;
+
+    //来通知以后所有刷新数据会到刷新里面
+    private boolean ik;
     private String wall;
     private String body;
 
@@ -420,6 +472,9 @@ public class Accessibility2Service extends AccessibilityService implements Runna
         boolean is = CollectionDataUtils.isText(nodeInfos, "查看");
         if (is) {
             print("进入" + tag);
+            //来过通知了
+            thread = null;
+            ik = true;
             //告诉他们，来通知了
             isNotice = true;
             isRun = true;
@@ -474,10 +529,11 @@ public class Accessibility2Service extends AccessibilityService implements Runna
         CollectionDataUtils.getAccessibilityNodeInfoDS(accessibilityNodeInfos, source);
         List<AccessibilityNodeInfo> nodeInfos = getBill(accessibilityNodeInfos);
         if (thread != null && !isNotice) {
-            return;
+            print("不允许重新开始" + isNotice);
+        } else {
+            thread = new Thread(TYPE_VIEW_SCROLLED_Runnable(nodeInfos));
+            thread.start();
         }
-        thread = new Thread(TYPE_VIEW_SCROLLED_Runnable(nodeInfos));
-        thread.start();
     }
 
     Runnable TYPE_VIEW_SCROLLED_Runnable(List<AccessibilityNodeInfo> nodeInfos) {
@@ -487,6 +543,7 @@ public class Accessibility2Service extends AccessibilityService implements Runna
             for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
                 String text = nodeInfo.getText().toString();
                 JSONObject jsonObject = getString(text);
+                print(tag + jsonObject);
                 if (jsonObject != null) {
                     String str = CollectionDataUtils.StingToMD5(jsonObject.toString());
                     if (str != null) {
@@ -497,22 +554,23 @@ public class Accessibility2Service extends AccessibilityService implements Runna
                                 long tss = config.getLong("time", System.currentTimeMillis()) / 1000;
                                 //判断账单时间是否大于本地时间
                                 if (ts > tss) {
-                                    CollectionDataUtils.performClickNodeInfo(nodeInfo);
-                                    this.body = jsonObject.toString();
-                                    //进入了交易详情，开始等待
-                                    while (true) {
-                                        //退出循环
-                                        if (isRun) {
-                                            isRun = false;
-                                            isHttpOk = false;
-                                            print(tag + "等待前面操作完毕");
+                                    boolean cli = CollectionDataUtils.performClickNodeInfo(nodeInfo);
+                                    do {
+                                        if (isNotice) {
                                             break;
                                         }
+                                        cli = CollectionDataUtils.performClickNodeInfo(nodeInfo);
+                                    } while (!cli);
+                                    print("点击成功" + nodeInfo);
+                                    this.body = jsonObject.toString();
+                                    //进入了交易详情，开始等待
+                                    while (!isRun) {
+                                        //退出循环
+                                        //print(tag + "等待前面操作完毕");
                                     }
-                                    if (isNotice) {
-                                        print(tag + "来通知了!退出循环");
-                                        break;
-                                    }
+                                    print(tag + "等待前面操作完毕");
+                                    isRun = false;
+                                    isHttpOk = false;
                                 }
                             }
                         }

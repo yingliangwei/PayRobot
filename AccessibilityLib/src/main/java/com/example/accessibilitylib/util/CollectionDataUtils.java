@@ -108,17 +108,7 @@ public class CollectionDataUtils {
     public static boolean click2(List<AccessibilityNodeInfo> nodeInfos, String text) {
         for (AccessibilityNodeInfo accessibilityNodeInfo : nodeInfos) {
             if (accessibilityNodeInfo.getText().toString().contains(text)) {
-                boolean clion = performClickNodeInfo(accessibilityNodeInfo);
-                if (clion) {
-                    return true;
-                } else {
-                    while (true) {
-                        clion = performClickNodeInfo(accessibilityNodeInfo);
-                        if (clion) {
-                            return true;
-                        }
-                    }
-                }
+                return performClickNodeInfo(accessibilityNodeInfo);
             }
         }
         return false;
@@ -132,22 +122,7 @@ public class CollectionDataUtils {
     public static boolean click(List<AccessibilityNodeInfo> nodeInfos, String text) {
         for (AccessibilityNodeInfo accessibilityNodeInfo : nodeInfos) {
             if (accessibilityNodeInfo.getText().toString().equals(text)) {
-                boolean clion = performClickNodeInfo(accessibilityNodeInfo);
-                if (clion) {
-                    return true;
-                } else {
-                    int size = 0;
-                    while (true) {
-                        size++;
-                        clion = performClickNodeInfo(accessibilityNodeInfo);
-                        if (clion) {
-                            return true;
-                        }
-                        if (size >= 10) {
-                            return false;
-                        }
-                    }
-                }
+                return performClickNodeInfo(accessibilityNodeInfo);
             }
         }
         return false;
@@ -165,6 +140,20 @@ public class CollectionDataUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * @param infos 集合节点
+     * @param text  判断集合中是否存在该字符串
+     * @return true=存在该字符串
+     */
+    public static AccessibilityNodeInfo isTextNodeInfo(List<AccessibilityNodeInfo> infos, String text) {
+        for (AccessibilityNodeInfo nodeInfo : infos) {
+            if (nodeInfo.getText().toString().equals(text)) {
+                return nodeInfo;
+            }
+        }
+        return null;
     }
 
     /**
@@ -226,8 +215,7 @@ public class CollectionDataUtils {
     public static boolean performClickNodeInfo(AccessibilityNodeInfo nodeInfo) {
         if (nodeInfo != null) {
             if (nodeInfo.isClickable()) {
-                nodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                return true;
+                return nodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK);
             } else {
                 AccessibilityNodeInfo parent = nodeInfo.getParent();
                 if (parent != null) {
