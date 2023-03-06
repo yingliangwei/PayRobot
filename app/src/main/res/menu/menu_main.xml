@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="设置"
+        android:iconTint="@color/white"
+        android:id="@+id/set"
+        android:icon="@mipmap/set"
+        app:showAsAction="always"
+        tools:ignore="HardcodedText" />
+</menu>

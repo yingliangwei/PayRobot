@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PayRobot</string>
+    <string name="accessibility_service_description">Android版本需要大于Android8,监听数字人民货币账单</string>
+    <string name="accessibility_service_label">账单监听</string>
+</resources>
