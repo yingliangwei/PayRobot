@@ -22,6 +22,10 @@ public class SetActivity extends MiracleGardenActivity<ActivitySetBinding> {
         setTitle("设置");
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         String url = config.getString("url", "1");
+        String ID = config.getString("ID", "1");
+        if (!ID.equals("1")) {
+            binding.ID.setText(ID);
+        }
         if (!url.equals("1")) {
             binding.url.setText(url);
         }
@@ -32,6 +36,7 @@ public class SetActivity extends MiracleGardenActivity<ActivitySetBinding> {
         binding.button.setOnClickListener(v -> {
             SharedPreferences.Editor edit = config.edit();
             edit.putString("url", binding.url.getText().toString());
+            edit.putString("ID", binding.ID.getText().toString());
             edit.putLong("time", System.currentTimeMillis());
             edit.apply();
             Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();

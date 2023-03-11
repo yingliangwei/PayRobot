@@ -30,6 +30,7 @@ import com.miraclegarden.library.app.MiracleGardenActivity;
 
 import com.miraclegarden.payrobot.AimFloat;
 import com.miraclegarden.payrobot.R;
+import com.miraclegarden.payrobot.accessibilityService.Accessibility1Service;
 import com.miraclegarden.payrobot.accessibilityService.AccessibilityService;
 import com.miraclegarden.payrobot.databinding.ActivityMainBinding;
 
@@ -61,6 +62,7 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
     };
     private SharedPreferences config;
     private ActivityResultLauncher<Intent> launch;
+    private AlertDialog.Builder builder;
 
     public static void sendMessage(String str) {
         if (textView != null && scrollView != null) {
@@ -131,13 +133,17 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
 
     private void permissionWindows() {
         if (!Settings.canDrawOverlays(this)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (builder != null) {
+                return;
+            }
+            builder = new AlertDialog.Builder(this);
             builder.setMessage("This application requires window overlays access permission, please allow first.");
             builder.setPositiveButton("OK", (param1DialogInterface, param1Int) -> {
                 Intent intent = new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION", Uri.parse("package:" + getPackageName()));
                 launch.launch(intent);
             });
             builder.setCancelable(false);
+
             builder.show();
         }
     }
@@ -158,7 +164,7 @@ public class MainActivity extends MiracleGardenActivity<ActivityMainBinding> {
         if (url.equals("1")) {
             startActivity(new Intent(this, SetActivity.class));
         }
-        boolean b = isServiceON(this, AccessibilityService.class.getName());
+        boolean b = isServiceON(this, Accessibility1Service.class.getName());
         if (!b) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

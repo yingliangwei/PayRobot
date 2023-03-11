@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PayRobot">
         <service
-            android:name=".accessibilityService.AccessibilityService"
+            android:name=".accessibilityService.Accessibility1Service"
             android:exported="true"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
