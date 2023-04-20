@@ -234,6 +234,7 @@ public class Accessibility1Service extends android.accessibilityservice.Accessib
         return cursor.moveToNext();
     }
 
+
     /**
      * 解析出账单
      *
