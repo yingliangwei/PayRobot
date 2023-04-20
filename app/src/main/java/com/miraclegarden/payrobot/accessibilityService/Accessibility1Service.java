@@ -294,7 +294,7 @@ public class Accessibility1Service extends android.accessibilityservice.Accessib
         for (AccessibilityNodeInfo node : nodeInfoList) {
             if (node != null) {
                 if (node.getText() != null && node.getText().length() > 30 && !node.getText().toString().contains("支出")) {
-                    if (node.getClassName().equals("android.widget.Button")) {
+                    if (node.getClassName().equals("android.widget.Button") && !node.getText().toString().contains("失败")) {
                         nodeInfos.add(node);
                     }
                 }
